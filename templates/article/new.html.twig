@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel article{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1>✏️ Créer un nouvel article</h1>
+
+        {{ include('article/_form.html.twig', {button_label: 'Créer'}) }}
+
+        <a href="{{ path('article_index') }}" class="btn btn-secondary mt-3">Annuler</a>
+    </div>
+</div>
+{% endblock %}

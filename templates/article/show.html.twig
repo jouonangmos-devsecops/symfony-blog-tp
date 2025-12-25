@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block body %}
+<article class="mb-5">
+    <h1>{{ article.title }}</h1>
+    <p class="text-muted">
+        Par {{ article.author.username }} - {{ article.createdAt|date('d/m/Y à H:i') }}
+    </p>
+    
+    {% if article.image %}
+        <img src="{{ asset('uploads/' ~ article.image) }}" class="img-fluid mb-4" alt="{{ article.title }}" style="max-width: 100%; height: auto;">
+    {% endif %}
+
+    <div class="content">
+        {{ article.content|nl2br }}
+    </div>
+
+    {% if app.user == article.author %}
+    <div class="mt-4">
+        <a href="{{ path('article_edit', {id: article.id}) }}" class="btn btn-warning">✏️ Modifier</a>
+        <a href="{{ path('article_delete', {id: article.id}) }}" class="btn btn-danger" 
+           onclick="return confirm('Confirmer la suppression ?')">🗑️ Supprimer</a>
+    </div>
+    {% endif %}
+</article>
+
+<hr class="my-5">
+
+<!-- SECTION COMMENTAIRES -->
+<section id="comments">
+    <h3 class="mb-4">💬 Commentaires ({{ article.comments|length }})</h3>
+
+    <!-- FORMULAIRE AJOUT COMMENTAIRE -->
+    {% if app.user %}
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">✍️ Ajouter un commentaire</h5>
+            </div>
+            <div class="card-body">
+                {{ form_start(comment_form, {'action': path('comment_add', {articleId: article.id}), 'method': 'POST'}) }}
+                    <div class="mb-3">
+                        {{ form_label(comment_form.content, 'Votre commentaire') }}
+                        {{ form_widget(comment_form.content, {
+                            'attr': {
+                                'class': 'form-control',
+                                'rows': 4,
+                                'placeholder': 'Écrivez votre commentaire ici...'
+                            }
+                        }) }}
+                        {{ form_errors(comment_form.content) }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        💬 Publier le commentaire
+                    </button>
+                {{ form_end(comment_form) }}
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            <strong>🔐 Connectez-vous pour commenter</strong><br>
+            <a href="{{ path('app_login') }}" class="btn btn-sm btn-primary mt-2">Se connecter</a>
+        </div>
+    {% endif %}
+
+    <!-- LISTE DES COMMENTAIRES -->
+    <div class="mt-4">
+        <h4 class="mb-3">Tous les commentaires :</h4>
+        
+        {% if article.comments|length > 0 %}
+            {% for comment in article.comments %}
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <p class="mb-2">{{ comment.content|nl2br }}</p>
+                    <hr>
+                    <p class="text-muted small mb-0">
+                        <strong>👤 {{ comment.author.username }}</strong> - 
+                        📅 {{ comment.createdAt|date('d/m/Y à H:i') }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                <strong>ℹ️ Aucun commentaire pour le moment.</strong><br>
+                Soyez le premier à commenter !
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<div class="mt-5">
+    <a href="{{ path('article_index') }}" class="btn btn-secondary">
+        ← Retour à la liste des articles
+    </a>
+</div>
+{% endblock %}

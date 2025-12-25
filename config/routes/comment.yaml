@@ -1,0 +1,5 @@
+comment_add:
+    path: /comment/add/{articleId}
+    controller: App\Controller\CommentController::add
+    requirements:
+        articleId: \d+
